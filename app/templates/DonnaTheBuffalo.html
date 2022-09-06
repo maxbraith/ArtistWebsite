@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Donna The Buffalo</h2>
+    {% for post in posts %}
+    <div><p>{{ post.body }}</p></div>
+    {% endfor %}
+{% endblock %}
