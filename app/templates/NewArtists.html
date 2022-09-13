@@ -1,8 +1,24 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h2>Create Artist</h2>
-    {% for post in posts %}
-    <div><p>{{ post.body }}</p></div>
-    {% endfor %}
+    <h1>New Artist</h1>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.artistName.label }}<br>
+            {{ form.artistName(size=32) }}<br>
+            {% for error in form.artistName.errors  %}
+            <span style="color: red;"></span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.hometown.label }}<br>
+            {{ form.hometown(size=32) }}
+        </p>
+        <p>
+            {{ form.description.label }}<br>
+            {{ form.description() }}
+        </p>
+        <p>{{ form.submitArtist() }}</p>
+    </form>
 {% endblock %}

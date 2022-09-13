@@ -2,7 +2,9 @@
 
 {% block content %}
     <h2>Gunpoets</h2>
-    <p>Voice as a weapon, words as bullets, spreading the universal message of peace, love, and justice through music. Sure, there's a cynical cultural tendency to make certain assumptions when you hear the word "gun" associated with rap music, but this seven-member live hip-hop band from Ithaca, NY, runs contrary to that image with their positive message and uplifting performances.</p>
+    <p>{{  posts.body  }}</p>
     <h3>Events</h3>
-    <p>The Commons on Thursday 9/6</p>
+    {% for event in events %}
+    <div><p>{{ events[event] }}</p></div>
+    {% endfor %}
 {% endblock %}
