@@ -41,7 +41,7 @@ def Artists():
 def NewArtists():
     form = LoginForm()
     if form.validate_on_submit():
-        flash('Artist submission requested {}'.format(
+        flash('Artist submission requested: {}'.format(
             form.artistName.data))
         return render_template('artistInfo.html', title='New Artists', form=form)
     return render_template('NewArtists.html', title='New Artists', form=form)
