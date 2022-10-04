@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h2>{{ user.username }}</h2>
-    <p>{{  posts.body  }}</p>
+    <h2>{{ artist.name }}</h2>
+    <p>{{  "Hometown: " + artist.hometown  }}</p>
     <h3>Events</h3>
-    {% for event in events %}
-    <div><p>{{ events[event] }}</p></div>
-    {% endfor %}
+    <ul>
+        {% for a2e in artist.artistToEvents %}
+        <li><b>{{ a2e.event.name }}</b> at the <b>{{ a2e.event.venue.name }}</b>
+       {% endfor %}
+    </ul>
 {% endblock %}

@@ -2,8 +2,7 @@
 
 {% block content %}
     <h2>List of Ithaca artists</h2>
-    <p><a href="/JohnBrownsBody">John Brown's Body</a></p>
-    <p><a href="/Gunpoets">Gunpoets</a></p>
-    <p><a href="/DonnaTheBuffalo">Donna The Buffalo</a></p>
-    <p><a href="/TheBlindSpots">The Blind Spots</a></p>
+    {% for artist in artists %}
+    <p><a href="{{ url_for('artist', name=artist.name) }}">{{ artist.name }}</a></p>
+    {% endfor %}
 {% endblock %}
