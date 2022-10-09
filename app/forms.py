@@ -12,3 +12,9 @@ class artistForm(FlaskForm):
         name1 = Artist.query.filter_by(name=name.data).first()
         if name1 is not None:
             raise ValidationError("Artist already submitted.")
+
+class loginForm(FlaskForm):
+    username = StringField("Username", validators=[DataRequired()])
+    password = PasswordField("Password", validators=[DataRequired()])
+    remember_me = BooleanField("Remember Me")
+    submit = SubmitField("Sign In")

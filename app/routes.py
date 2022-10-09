@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect
 from app import app, db
-from app.forms import artistForm
+from app.forms import artistForm, loginForm
 from app.models import Artist, Event, Venue, ArtistToEvent
 
 
@@ -88,6 +88,11 @@ def artist(name):
     a = Artist.query.filter(Artist.name==name).first_or_404()
 
     return render_template('GunPoets.html', title=a.name, artist=a)
+
+@app.route('/login')
+def login():
+    form = loginForm()
+    return render_template('login.html', title="Sign In", form=form)
 
 
 
