@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect
 from app import app, db
-from app.forms import LoginForm
+from app.forms import artistForm
 from app.models import Artist, Event, Venue, ArtistToEvent
 
 
@@ -18,7 +18,7 @@ def Artists():
 
 @app.route("/NewArtists", methods=['GET', 'POST'])
 def NewArtists():
-    form = LoginForm()
+    form = artistForm()
     if form.validate_on_submit():
         flash('Artist submission requested: {}'.format(
             form.artistName.data))
@@ -85,7 +85,7 @@ def reset_db():
 
 @app.route('/artist/<name>')
 def artist(name):
-    a = Artist.query.filter(Artist.name==name).first()
+    a = Artist.query.filter(Artist.name==name).first_or_404()
 
     return render_template('GunPoets.html', title=a.name, artist=a)
 
