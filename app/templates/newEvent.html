@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>New Event</h1>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.eventName.label }}<br>
+            {{ form.eventName(size=32) }}<br>
+            {% for error in form.eventName.errors  %}
+            <span style="color: red;"></span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.date.label }}<br>
+            {{ form.date(class='datepicker') }}
+        </p>
+        <p>
+            {{ form.venue.label }}<br>
+            {{ form.venue(class="choices") }}
+
+        </p>
+        <p>
+            {{ form.a2e.label }}<br>
+            {{ form.a2e(class="choices") }}
+        </p>
+        <p>{{ form.submitEvent() }}</p>
+    </form>
+{% endblock %}

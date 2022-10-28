@@ -1,7 +1,9 @@
-from flask import render_template, flash, redirect
+from flask import render_template, flash, redirect, url_for
 from app import app, db
-from app.forms import artistForm, loginForm
-from app.models import Artist, Event, Venue, ArtistToEvent
+from app.forms import artistForm, loginForm, RegistrationForm, eventForm, venueForm
+from app.models import Artist, Event, Venue, ArtistToEvent, User
+from flask_login import current_user, login_user, logout_user, login_required
+from datetime import datetime
 
 
 @app.route('/')
@@ -17,6 +19,7 @@ def Artists():
 
 
 @app.route("/NewArtists", methods=['GET', 'POST'])
+@login_required
 def NewArtists():
     form = artistForm()
     if form.validate_on_submit():
@@ -28,10 +31,50 @@ def NewArtists():
         return render_template('artistInfo.html', title='New Artists', form=form)
     return render_template('NewArtists.html', title='New Artists', form=form)
 
+
+@app.route('/NewEvents', methods=['GET', 'POST'])
+@login_required
+def NewEvents():
+    form = eventForm()
+    form.venue.choices = [(v.id, v.name) for v in Venue.query.all()]
+    form.a2e.choices = [(a.id, a.name) for a in Artist.query.all()]
+    if form.validate_on_submit():
+        flash('Event submission request: {}'.format(
+            form.eventName.data))
+        newEvent = Event(name=form.eventName.data, date=form.date.data, venue_id=form.venue.data)
+        db.session.add(newEvent)
+        db.session.commit()
+
+        for id in form.a2e.data:
+            ate = ArtistToEvent(artist_id=id, event_id=newEvent.id)
+            db.session.add(ate)
+            db.session.commit()
+        return redirect("index")
+    return render_template('newEvent.html', title='New Event', form=form)
+
+@app.route('/NewVenues', methods=['GET', 'POST'])
+@login_required
+def NewVenues():
+    form = venueForm()
+    if form.validate_on_submit():
+        flash('Venue submission request: {}'.format(
+            form.venueName.data))
+        newVenue = Venue(name=form.venueName.data, address=form.address.data)
+        db.session.add(newVenue)
+        db.session.commit()
+        return redirect(url_for('index'))
+    return render_template("newVenue.html", title='New Venue', form=form)
+
+
+
+
+
+
 @app.route('/populate_db')
 def populate_db():
 
     reset_db()
+
 
     a1 = Artist(name='a1', hometown='Ithaca')
     a2 = Artist(name='a2', hometown='Cortland')
@@ -47,13 +90,20 @@ def populate_db():
     db.session.add_all([v1,v2,v3])
     db.session.commit()
 
-    e1 = Event(name='e1', date='August 4', venue_id=1)
-    e2 = Event(name='e2', date='January 3', venue_id=3)
-    e3 = Event(name='e3', date='February 9', venue_id=3)
-    e4 = Event(name='e4', date='March 27', venue_id=2)
-    e5 = Event(name='e5', date='November 12', venue_id=1)
-    e6 = Event(name='e6', date='October 5', venue_id=2)
-    e7 = Event(name='e7', date='July 30', venue_id=3)
+    dt = datetime(2022, 11, 1)
+    dt2 = datetime(2022, 1, 3)
+    dt3 = datetime(2022, 2, 9)
+    dt4 = datetime(2022, 3, 27)
+    dt5 = datetime(2022, 9, 12)
+    dt6 = datetime(2022, 8, 5)
+    dt7 = datetime(2022, 7, 30)
+    e1 = Event(name='e1', date=dt, venue_id=1)
+    e2 = Event(name='e2', date=dt2, venue_id=3)
+    e3 = Event(name='e3', date=dt3, venue_id=3)
+    e4 = Event(name='e4', date=dt4, venue_id=2)
+    e5 = Event(name='e5', date=dt5, venue_id=1)
+    e6 = Event(name='e6', date=dt6, venue_id=2)
+    e7 = Event(name='e7', date=dt7, venue_id=3)
     db.session.add_all([e1,e2,e3,e4,e5,e6,e7])
     db.session.commit()
 
@@ -67,7 +117,6 @@ def populate_db():
     ate8 = ArtistToEvent(artist_id=3, event_id=3)
     db.session.add_all([ate1,ate2,ate3,ate4,ate5,ate6,ate7,ate8])
     db.session.commit()
-
 
     flash("Database has been populated")
     return render_template('base.html', title='Home')
@@ -89,10 +138,39 @@ def artist(name):
 
     return render_template('GunPoets.html', title=a.name, artist=a)
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
     form = loginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user is None or not user.check_password(form.password.data):
+            flash("Invalid username or password")
+            return redirect(url_for('login'))
+        login_user(user, remember=form.remember_me.data)
+        return redirect(url_for('index'))
     return render_template('login.html', title="Sign In", form=form)
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = User(username=form.username.data, email=form.email.data, password=form.password.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash("User registered.")
+        return redirect(url_for('login'))
+    return render_template('register.html', title="Register", form=form)
+
 
 
 
